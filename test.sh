@@ -127,11 +127,25 @@ if [ -z "$SOURCE" ]; then
 	usage
 fi
 
-if [ -z "$TESTSUITE" ]; then
-	echo "Error: missing testsuite parameter"
-	usage
-fi
+if "$RECORD" == "true" ]; then
 
+	echo "#"
+	echo "# running in RECORDING mode"
+	echo "# $(date)"
+	echo "#"
+
+else
+
+	if [ -z "$TESTSUITE" ]; then
+		echo "Error: missing testsuite parameter"
+		usage
+	fi
+
+	echo "#"
+	echo "# running in TESTING mode"
+	echo "# $(date)"
+	echo "#"
+fi
 
 # check for existing image, reuse if it exists (and not forced to update)
 if docker inspect --type=image $NAME >/dev/null 2>&1; then
@@ -241,7 +255,7 @@ else
 	if [ "$EXIT_CODE" != "0" ]; then
 
 		echo "Tests failed, dumping Structr log.."
-		docker exec -ti $CONTAINER /bin/sh -c 'cat /var/lib/structr/logs/server.log'
+		docker exec -ti $CONTAINER /bin/sh -c 'cat /var/lib/structr/logs/server.log' |tee -a $LOG
 	fi
 
 	echo "Stopping containers.." |tee -a $LOG
