@@ -247,16 +247,12 @@ else
 	docker image build -q -t selenium-test . >>$LOG || exit 1
 
 	echo "Creating test container.." |tee -a $LOG
-	TESTCONTAINER=$(docker create --network $NETWORK selenium-test)
+	TESTCONTAINER=$(docker create --network $NETWORK --shm-size=2g selenium-test)
 	docker cp $TESTSUITE $TESTCONTAINER:/tmp/ >>$LOG || exit 1
 	docker start -a $TESTCONTAINER |tee -a $LOG || exit 1
 
-	EXIT_CODE=$(docker container inspect $TESTCONTAINER --format='{{.State.ExitCode}}')
-	if [ "$EXIT_CODE" != "0" ]; then
-
-		echo "Tests failed, dumping Structr log.."
-		docker exec -ti $CONTAINER /bin/sh -c 'cat /var/lib/structr/logs/server.log' |tee -a $LOG
-	fi
+	echo "Downloading server.log.."
+	docker exec -ti $CONTAINER /bin/sh -c 'cat /var/lib/structr/logs/server.log' >server.log
 
 	echo "Stopping containers.." |tee -a $LOG
 	docker stop $CONTAINER >>$LOG || exit 1
