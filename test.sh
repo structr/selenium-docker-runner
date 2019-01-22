@@ -180,6 +180,10 @@ if [ "$IMAGE_EXISTS" == "true" ] && [ "$REUSE_EXISTING" == "true" ]; then
 		cancel
 	fi
 
+	if [ -x /usr/bin/notify-send ]; then
+		notify-send "Structr Selenium Test Runner" "Test instance is ready"
+	fi
+
 else
 
 	#
@@ -248,7 +252,7 @@ else
 
 	echo "Creating test container.." |tee -a $LOG
 	TESTCONTAINER=$(docker create --network $NETWORK --shm-size=2g selenium-test)
-	docker cp $TESTSUITE $TESTCONTAINER:/tmp/ >>$LOG || exit 1
+	docker cp $TESTSUITE $TESTCONTAINER:/tmp/testsuite >>$LOG || exit 1
 	docker start -a $TESTCONTAINER |tee -a $LOG || exit 1
 
 	echo "Downloading server.log.."
