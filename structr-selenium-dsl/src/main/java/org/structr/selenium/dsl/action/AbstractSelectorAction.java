@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.apache.commons.lang3.StringUtils;
 import org.structr.selenium.dsl.command.Command;
 import org.structr.selenium.dsl.runner.interactive.Completion;
 import org.structr.selenium.dsl.selector.AbstractSelector;
@@ -27,7 +26,7 @@ public abstract class AbstractSelectorAction extends AbstractAction {
 	@Override
 	public List<Completion> getAutocompleteResults(final String part) {
 
-		if (StringUtils.isNotBlank(part)) {
+		if (part != null) {
 
 			final Map<String, Class<? extends Command>> commandMap = context.getCommandFactory().getCommands();
 			final List<Completion> results                         = new LinkedList<>();
@@ -39,7 +38,7 @@ public abstract class AbstractSelectorAction extends AbstractAction {
 
 				if (AbstractSelector.class.isAssignableFrom(type) && key.startsWith(part)) {
 
-					results.add(new Completion(key, key + " "));
+					results.add(new Completion(key, true));
 				}
 			}
 

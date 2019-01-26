@@ -76,7 +76,7 @@ public class OpenCommand extends AbstractAction {
 
 				if (option.startsWith(part)) {
 
-					results.add(new Completion(option));
+					results.add(new Completion(option, false));
 				}
 			}
 

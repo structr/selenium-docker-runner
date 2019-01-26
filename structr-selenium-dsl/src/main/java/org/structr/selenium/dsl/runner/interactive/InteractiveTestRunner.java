@@ -176,6 +176,11 @@ public class InteractiveTestRunner extends AbstractTestRunner implements Termina
 		final String line                    = term.getCurrentLine();
 		final TokenQueue tokens              = factory.split(line);
 		final List<String> parts             = tokens.getRawTokens();
+
+		if (line.endsWith(" ")) {
+			parts.add("");
+		}
+
 		final int count                      = parts.size();
 		final String last                    = count == 0 ? "" : stripQuotes(parts.get(count - 1));
 
@@ -240,7 +245,7 @@ public class InteractiveTestRunner extends AbstractTestRunner implements Termina
 
 			if (name.startsWith(part)) {
 
-				possibilities.add(new Completion(name, name + " "));
+				possibilities.add(new Completion(name, true));
 			}
 		}
 	}
@@ -252,7 +257,14 @@ public class InteractiveTestRunner extends AbstractTestRunner implements Termina
 			final Completion result = possibilities.get(0);
 			final String repl       = result.getCompletion(part);
 
+			//print replacement
 			term.print(repl);
+
+			// append space?
+			if (result.appendSpace() && !line.endsWith(" ")) {
+				term.print(" ");
+			}
+
 			term.clearTabCount();
 
 		} else if (!possibilities.isEmpty()) {

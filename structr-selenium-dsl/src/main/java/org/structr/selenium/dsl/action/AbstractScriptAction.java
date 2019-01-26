@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.structr.selenium.dsl.runner.interactive.Completion;
 
 /**
@@ -28,7 +27,7 @@ public abstract class AbstractScriptAction extends AbstractAction {
 	@Override
 	public List<Completion> getAutocompleteResults(final String part) {
 
-		if (StringUtils.isNotBlank(part)) {
+		if (part != null) {
 
 			final List<Completion> results = new LinkedList<>();
 			Path startDir                  = Paths.get(part);
@@ -54,10 +53,10 @@ public abstract class AbstractScriptAction extends AbstractAction {
 							final String value        = t.toString();
 
 							if (Files.isDirectory(t)) {
-								return new Completion(displayValue, value + "/");
+								return new Completion(displayValue, value + "/", false);
 							}
 
-							return new Completion(displayValue, value);
+							return new Completion(displayValue, value, false);
 						}
 					}
 

@@ -10,18 +10,24 @@ package org.structr.selenium.dsl.runner.interactive;
  */
 public class Completion {
 
+	private boolean appendSpace = false;
 	private String displayValue = null;
 	private String value        = null;
 
-	public Completion(final String value) {
-		this(value, value);
+	public Completion(final String value, final boolean appendSpace) {
+		this(value, value, appendSpace);
 	}
 
-	public Completion(final String displayValue, final String value) {
+	public Completion(final String displayValue, final String value, final boolean appendSpace) {
 
+		this.appendSpace  = appendSpace;
 		this.displayValue = displayValue;
 		this.value        = value;
 
+	}
+
+	public boolean appendSpace() {
+		return appendSpace;
 	}
 
 	public String getDisplayValue() {

@@ -80,7 +80,7 @@ public class NameCommand extends MultiElementSelector {
 					final String tagName = elem.getTagName();
 					final String id      = elem.getAttribute("id");
 
-					results.add(new Completion(id + " (" + tagName + ")", id));
+					results.add(new Completion(id + " (" + tagName + ")", id, false));
 				}
 			}
 

@@ -8,7 +8,6 @@ package org.structr.selenium.dsl.selector;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -63,7 +62,7 @@ public class IdCommand extends ElementSelector {
 	@Override
 	public List<Completion> getAutocompleteResults(final String part) {
 
-		if (StringUtils.isNotBlank(part)) {
+		if (part != null) {
 
 			final WebDriver driver          = context.getWebDriver();
 			final List<WebElement> elements = driver.findElements(By.xpath("//*[starts-with(@id,'" + part + "')]"));
@@ -76,7 +75,7 @@ public class IdCommand extends ElementSelector {
 					final String tagName = elem.getTagName();
 					final String id      = elem.getAttribute("id");
 
-					results.add(new Completion(id + " (" + tagName + ")", id));
+					results.add(new Completion(id + " (" + tagName + ")", id, false));
 				}
 			}
 

@@ -2,5 +2,6 @@ structr-selenium-dsl/.structr-selenium-runner
 structr-selenium-dsl/nbactions.xml
 structr-selenium-dsl/nbproject/
 structr-selenium-dsl/target/
+structr-selenium-dsl-*.jar
 
 

@@ -76,7 +76,7 @@ public class ClassCommand extends MultiElementSelector {
 					final String tagName = elem.getTagName();
 					final String css     = elem.getAttribute("class");
 
-					results.add(new Completion(css + " (" + tagName + ")", css));
+					results.add(new Completion(css + " (" + tagName + ")", css, false));
 				}
 			}
 
