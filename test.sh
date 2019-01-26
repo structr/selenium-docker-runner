@@ -35,21 +35,18 @@ function usage() {
 
 	echo
 	echo "Usage"
-	echo "    test.sh [-c] [-h] [-n <image name>] [-l <logfile>] [-r] [-u] [-v <version>]"
-	echo "            <deployment source> <testsuite.side>"
+	echo "    test.sh [-c] [-d <webapp>] [-h] [-n <image name>] [-l <logfile>] [-r] [-u] [-v <version> [-t <testsuite>]"
 	echo
 	echo "Options"
 	echo "    -c              - dump configuration and exit"
+	echo "    -d <webapp>     - deploy the webapp from the given directory"
 	echo "    -h              - print this message and exit"
 	echo "    -l <logfile>    - use given log file (default: /dev/null)"
 	echo "    -n <image name> - use given test image name (default: $NAME)"
 	echo "    -r              - recording mode (dont run tests, just start the instance)"
+	echo "    -t <testsuite>  - run tests in the given directory"
 	echo "    -u              - update test image (don't resuse existing images)"
 	echo "    -v <version>    - use given Structr version (default: 3.1.1)"
-	echo
-	echo "Parameters"
-	echo "    <deployment source> - Structr deployment export to test"
-	echo "    <testsuite.side>    - Selenium test suite to run"
 	echo
 	echo "Docker reference"
 	echo "    list containers         - docker container ls [-a]"
@@ -68,25 +65,18 @@ function usage() {
 while [ "$#" -gt 0 ]; do
 
 	case "$1" in
-		-c) CLEANUP="true"; shift 1;;
+		-c) DUMP_CONFIG="true"; shift 1;;
+		-d) SOURCE="$2"; shift 2;;
 		-h) usage; shift 1;;
 		-l) LOG="$2"; shift 2;;
 		-n) NAME="$2"; shift 2;;
 		-r) RECORD="true"; shift 1;;
-		-s) DUMP_CONFIG="true"; shift 1;;
-		-u) REUSE_EXISTING="false"; shift 1;;
+		-r) RECORD="true"; shift 1;;
+		-t) TESTSUITE="$2"; shift 2;;
 		-v) VERSION="$2"; shift 2;;
 		*)
-			# unknown option
-			if [ -z "$SOURCE" ]; then
-				SOURCE="$1"
-			elif [ -z "$TESTSUITE" ]; then
-				TESTSUITE="$1"
-			else
-				echo "Error: unknown option $1"
-				usage
-			fi
-			shift
+			echo "Error: unknown option $1"
+			usage
 			;;
 
 	esac
@@ -120,11 +110,6 @@ if [ "$REUSE_EXISTING" == "false" ]; then
 	echo "Removing test image" |tee -a $LOG
 	docker image rm selenium-test >>$LOG
 
-fi
-
-if [ -z "$SOURCE" ]; then
-	echo "Error: missing deployment source parameter"
-	usage
 fi
 
 if "$RECORD" == "true" ]; then
