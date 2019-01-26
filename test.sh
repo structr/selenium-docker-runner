@@ -132,6 +132,16 @@ else
 	echo "#"
 fi
 
+# check for existence of structr-selenium-dsl and build the project
+if [ ! -e structr-selenium-dsl-0.1-SNAPSHOT.jar ]; then 
+
+	echo "Building selenium test runner.."
+	cd structr-selenium-dsl
+	mvn clean package
+	cp target/structr-selenium-dsl-0.1-SNAPSHOT.jar ..
+	cd ..
+fi
+
 # check for existing image, reuse if it exists (and not forced to update)
 if docker inspect --type=image $NAME >/dev/null 2>&1; then
 	IMAGE_EXISTS=true
