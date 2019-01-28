@@ -6,7 +6,7 @@
 
 package org.structr.selenium.dsl.action;
 
-import com.sun.glass.events.KeyEvent;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;

@@ -6,9 +6,9 @@
 
 package org.structr.selenium.dsl.action;
 
-import static com.sun.glass.events.KeyEvent.VK_A;
-import static com.sun.glass.events.KeyEvent.VK_N;
-import static com.sun.glass.events.KeyEvent.VK_Y;
+import static java.awt.event.KeyEvent.VK_A;
+import static java.awt.event.KeyEvent.VK_N;
+import static java.awt.event.KeyEvent.VK_Y;
 import org.structr.selenium.dsl.runner.script.ScriptFile;
 import org.structr.selenium.dsl.token.TokenQueue;
 import org.structr.selenium.dsl.runner.interactive.Terminal;

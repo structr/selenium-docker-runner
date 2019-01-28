@@ -1,4 +1,5 @@
-structr-selenium-dsl/.structr-selenium-runner
+**/.structr-selenium-runner
+**/server.log
 structr-selenium-dsl/nbactions.xml
 structr-selenium-dsl/nbproject/
 structr-selenium-dsl/target/
