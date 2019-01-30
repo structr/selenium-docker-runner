@@ -53,7 +53,7 @@ public abstract class AbstractAction extends Command {
 
 		if (StringUtils.isNotBlank(css)) {
 			buf.append(".");
-			buf.append(css);
+			buf.append(css.replaceAll("[\\s]+", "."));
 		}
 
 		return buf.toString();

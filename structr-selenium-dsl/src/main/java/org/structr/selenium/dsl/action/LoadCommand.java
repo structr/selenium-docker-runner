@@ -6,6 +6,8 @@
 
 package org.structr.selenium.dsl.action;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.structr.selenium.dsl.runner.script.ScriptFile;
 import org.structr.selenium.dsl.token.TokenQueue;
 import org.structr.selenium.dsl.runner.interactive.Terminal;
@@ -28,7 +30,8 @@ public class LoadCommand extends AbstractScriptAction {
 	@Override
 	public boolean execute(final Terminal out) {
 
-		final ScriptFile scriptFile = new ScriptFile(name);
+		final Path path             = context.getPathRelativeToWorkDir(Paths.get(name));
+		final ScriptFile scriptFile = new ScriptFile(path.toString());
 
 		context.undefine("script");
 		context.define("script", scriptFile);

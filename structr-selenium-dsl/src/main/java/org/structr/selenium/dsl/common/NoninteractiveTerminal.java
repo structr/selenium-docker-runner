@@ -13,8 +13,12 @@ import org.structr.selenium.dsl.runner.interactive.Terminal;
  */
 public class NoninteractiveTerminal implements Terminal {
 
+	private boolean output = false;
+
 	@Override
 	public void print(Object... input) {
+
+		output = true;
 
 		for (final Object o : input) {
 			System.out.print(o);
@@ -59,6 +63,9 @@ public class NoninteractiveTerminal implements Terminal {
 
 	@Override
 	public void println() {
+
+		output = true;
+		
 		System.out.println();
 	}
 
@@ -79,5 +86,19 @@ public class NoninteractiveTerminal implements Terminal {
 	@Override
 	public boolean isInteractive() {
 		return false;
+	}
+
+	@Override
+	public boolean receivedOutput() {
+		return output;
+	}
+
+	@Override
+	public void resetReceivedOutputFlag() {
+		output = false;
+	}
+
+	@Override
+	public void setInteractive(boolean interactive) {
 	}
 }

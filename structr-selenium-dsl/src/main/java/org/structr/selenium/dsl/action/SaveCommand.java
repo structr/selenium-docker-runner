@@ -6,6 +6,8 @@
 
 package org.structr.selenium.dsl.action;
 
+import java.io.File;
+import java.nio.file.Paths;
 import org.structr.selenium.dsl.runner.script.ScriptFile;
 import org.structr.selenium.dsl.token.TokenQueue;
 import org.structr.selenium.dsl.runner.interactive.Terminal;
@@ -33,7 +35,20 @@ public class SaveCommand extends AbstractScriptAction {
 
 			if (scriptFile.getPath() == null) {
 
-				out.println("Script file has no path yet, please provide path parameter.");
+				if (path != null) {
+
+					final File file = context.getPathRelativeToWorkDir(Paths.get(path)).toFile();
+
+					if (!file.exists() || out.prompt("File exists, overwrite? (y/n) ") ) {
+						
+						scriptFile.setPath(path);
+						scriptFile.save();
+					}
+					
+				} else {
+
+					out.println("Script file has no path yet, please provide path parameter.");
+				}
 
 			} else {
 

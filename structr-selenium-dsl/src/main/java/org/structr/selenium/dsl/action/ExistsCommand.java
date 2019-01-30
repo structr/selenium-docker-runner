@@ -6,19 +6,17 @@
 
 package org.structr.selenium.dsl.action;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import org.structr.selenium.dsl.selector.AbstractSelector;
 import org.structr.selenium.dsl.token.TokenQueue;
 import org.structr.selenium.dsl.runner.interactive.Terminal;
 
 /**
  */
-public class FindCommand extends AbstractSelectorAction {
+public class ExistsCommand extends AbstractSelectorAction {
 
 	private AbstractSelector selector = null;
 
-	public FindCommand() {
+	public ExistsCommand() {
 		super();
 	}
 
@@ -30,38 +28,17 @@ public class FindCommand extends AbstractSelectorAction {
 	@Override
 	public boolean execute(final Terminal out) {
 	
-		if (selector != null) {
-
-			final List<String> result = collect(selector.get())
-				.stream()
-				.map(AbstractAction::getDescription)
-				.collect(Collectors.toList());
-
-			if (result.isEmpty()) {
-
-				out.println("No results");
-
-			} else {
-
-				final int count = result.size();
-				out.println(count, " result", count == 1 ? ":" : "s:");
-				printPadded(out, result);
-			}
-
-			return true;
-		}
-
-		return false;
+		return collect(selector.get()).size() > 0;
 	}
 
 	@Override
 	public String getErrorMessage() {
-		return "Assertion failure: " + selector.getElementMessage() + " not found.";
+		return null;
 	}
 
 	@Override
 	public String usage() {
-		return "find <selector> - lists all elements that match the given selector.";
+		return "exists <selector> - return true if given selector contains at least one element.";
 	}
 
 	@Override

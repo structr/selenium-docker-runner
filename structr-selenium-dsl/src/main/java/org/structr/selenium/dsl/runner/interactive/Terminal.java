@@ -12,6 +12,7 @@ import java.util.Set;
 public interface Terminal {
 
 	boolean isInteractive();
+	void setInteractive(final boolean interactive);
 
 	void print(final Object... o);
 	void println(final Object... o);
@@ -29,4 +30,7 @@ public interface Terminal {
 	int prompt(final String message, final Set<Integer> options);
 	boolean prompt(final String message);
 	void read(final String message);
+
+	boolean receivedOutput();
+	void resetReceivedOutputFlag();
 }

@@ -43,7 +43,12 @@ import org.structr.selenium.dsl.action.StepCommand;
 import org.structr.selenium.dsl.action.StopCommand;
 import org.structr.selenium.dsl.action.TypeCommand;
 import org.structr.selenium.dsl.action.AssertCommand;
+import org.structr.selenium.dsl.action.ExistsCommand;
 import org.structr.selenium.dsl.action.FindCommand;
+import org.structr.selenium.dsl.action.FromCommand;
+import org.structr.selenium.dsl.action.IfCommand;
+import org.structr.selenium.dsl.action.NotCommand;
+import org.structr.selenium.dsl.action.SendKeysCommand;
 import org.structr.selenium.dsl.selector.ClassCommand;
 import org.structr.selenium.dsl.selector.GetCommand;
 import org.structr.selenium.dsl.selector.NameCommand;
@@ -52,6 +57,7 @@ import org.structr.selenium.dsl.selector.TagCommand;
 import org.structr.selenium.dsl.selector.TextCommand;
 import org.structr.selenium.dsl.selector.XPathCommand;
 import org.structr.selenium.dsl.runner.side.SideTest;
+import org.structr.selenium.dsl.selector.ChildCommand;
 import org.structr.selenium.dsl.selector.ChildrenCommand;
 import org.structr.selenium.dsl.selector.ParentCommand;
 
@@ -65,6 +71,7 @@ public class CommandFactory {
 
 	public CommandFactory() {
 
+		commands.put("#",                     ChildCommand.class);
 		commands.put("assert",                AssertCommand.class);
 		commands.put("children",              ChildrenCommand.class);
 		commands.put("class",                 ClassCommand.class);
@@ -72,10 +79,13 @@ public class CommandFactory {
 		commands.put("click",                 ClickCommand.class);
 		commands.put("css",                   SelectorCommand.class);
 		commands.put("define",                DefineCommand.class);
+		commands.put("exists",                ExistsCommand.class);
+		commands.put("from",                  FromCommand.class);
 		commands.put("find",                  FindCommand.class);
 		commands.put("get",                   GetCommand.class);
 		commands.put("help",                  HelpCommand.class);
 		commands.put("id",                    IdCommand.class);
+		commands.put("if",                    IfCommand.class);
 		commands.put("list",                  ListCommand.class);
 		commands.put("load",                  LoadCommand.class);
 		commands.put("mouseDownAt",           MouseDownAtCommand.class);
@@ -84,6 +94,7 @@ public class CommandFactory {
 		commands.put("mouseUpAt",             MouseUpAtCommand.class);
 		commands.put("name",                  NameCommand.class);
 		commands.put("new",                   NewCommand.class);
+		commands.put("not",                   NotCommand.class);
 		commands.put("open",                  OpenCommand.class);
 		commands.put("parent",                ParentCommand.class);
 		commands.put("pause",                 WaitCommand.class);
@@ -94,6 +105,7 @@ public class CommandFactory {
 		commands.put("runScript",             RunScriptCommand.class);
 		commands.put("save",                  SaveCommand.class);
 		commands.put("select",                SelectCommand.class);
+		commands.put("sendKeys",              SendKeysCommand.class);
 		commands.put("setWindowSize",         SetWindowSizeCommand.class);
 		commands.put("step",                  StepCommand.class);
 		commands.put("stop",                  StopCommand.class);
@@ -145,7 +157,7 @@ public class CommandFactory {
 		return null;
 	}
 
-	public Command fromLine(final Context context, final int lineNumber, final String line) {
+	public Command fromLine(final Context context, final String line) {
 
 		// ignore comments
 		if (!line.startsWith("#")) {

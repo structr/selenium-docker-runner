@@ -37,12 +37,8 @@ public class InteractiveTestRunner extends AbstractTestRunner implements Termina
 	private final List<String> commandHistory = new LinkedList<>();
 	private TerminalEmulator term             = null;
 
-	public InteractiveTestRunner(final Context context, final int width) {
-
-		super(context, width);
-
-		this.context = context;
-		this.commandHistory.add("mouseOver div text \"div\"");
+	public InteractiveTestRunner(final Context context) {
+		super(context);
 	}
 
 	public int run() throws InterruptedException {
@@ -114,9 +110,7 @@ public class InteractiveTestRunner extends AbstractTestRunner implements Termina
 	@Override
 	public void handleLine(final String line) {
 
-		final CommandFactory factory = context.getCommandFactory();
-		final String trimmed         = line.trim();
-
+		final String trimmed = line.trim();
 		if (trimmed.length() > 0) {
 
 			if ("exit".equals(trimmed)) {
@@ -126,45 +120,8 @@ public class InteractiveTestRunner extends AbstractTestRunner implements Termina
 				return;
 			}
 
-			try {
-
-				commandHistory.add(trimmed);
-
-				final Command command = factory.fromLine(context, 0, trimmed);
-				if (command != null) {
-
-					if (command instanceof AbstractAction) {
-
-						final AbstractAction action = (AbstractAction)command;
-
-						if (!command.execute(term)) {
-
-							term.printlnRed("Failed: " + action.getErrorMessage());
-
-						} else if (context.isRecording() && action.isRecordable()) {
-
-							final ScriptFile file = context.getCurrentScript();
-							if (file != null) {
-
-								term.println("Action recorded.");
-								file.addCommand(trimmed);
-							}
-						}
-
-					} else {
-
-						term.printlnRed("Error: command must be either action or assertion.");
-					}
-
-				} else {
-
-					term.printlnRed("Error: unknown command \"" + trimmed + "\"");
-				}
-
-			} catch (Throwable t) {
-
-				term.printlnRed("Error: " + t.getMessage());
-			}
+			context.runLine(term, trimmed, -1, 0);
+			commandHistory.add(trimmed);
 		}
 	}
 

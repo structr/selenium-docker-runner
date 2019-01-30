@@ -43,6 +43,8 @@ public class TerminalEmulator extends Thread implements KeyListener, Terminal {
 	protected Queue<Integer> keyQueue = new ConcurrentLinkedQueue<>();
 	protected JTextPane out           = null;
 	protected TerminalHandler handler = null;
+	protected boolean interactive     = true;
+	protected boolean output          = false;
 	protected boolean running         = false;
 	protected boolean echo            = true;
 	protected int commandBufferIndex  = 0;
@@ -179,7 +181,12 @@ public class TerminalEmulator extends Thread implements KeyListener, Terminal {
 
 	@Override
 	public boolean isInteractive() {
-		return true;
+		return interactive;
+	}
+
+	@Override
+	public void setInteractive(boolean interactive) {
+		this.interactive = interactive;
 	}
 
 	// ----- print methods -----
@@ -288,6 +295,16 @@ public class TerminalEmulator extends Thread implements KeyListener, Terminal {
 		}
 
 		println();
+	}
+
+	@Override
+	public boolean receivedOutput() {
+		return output;
+	}
+
+	@Override
+	public void resetReceivedOutputFlag() {
+		output = false;
 	}
 
 	// ----- protected methods -----
@@ -415,6 +432,8 @@ public class TerminalEmulator extends Thread implements KeyListener, Terminal {
 	}
 
 	private void print(final Style style, final String str, final boolean newline) {
+
+		output = true;
 
 		SwingUtilities.invokeLater(() -> {
 

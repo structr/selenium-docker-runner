@@ -80,14 +80,13 @@ public abstract class Command {
 
 	protected List<WebElement> xpath(final String path, final int waitTimeInSeconds) {
 
-		final int actualTime   = waitTimeInSeconds > 0 ? waitTimeInSeconds : waitTime;
-		final WebDriver driver = context.getWebDriver();
+		final int actualTime     = waitTimeInSeconds > 0 ? waitTimeInSeconds : waitTime;
+		final WebDriver driver   = context.getWebDriver();
+		final WebDriverWait wait = new WebDriverWait(driver, actualTime);
+		final By byXpath         = By.xpath(path);
 
-		try {
-
-			return new WebDriverWait(driver, actualTime).until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(path)));
-
-		} catch (TimeoutException e) {}
+		try { wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(byXpath)); } catch (TimeoutException e) {}
+		try { return wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(byXpath, 0)); } catch (TimeoutException e) {}
 
 		return null;
 	}
@@ -98,14 +97,13 @@ public abstract class Command {
 
 	protected List<WebElement> selector(final String selector, final int waitTimeInSeconds) {
 
-		final int actualTime   = waitTimeInSeconds > 0 ? waitTimeInSeconds : waitTime;
-		final WebDriver driver = context.getWebDriver();
+		final int actualTime     = waitTimeInSeconds > 0 ? waitTimeInSeconds : waitTime;
+		final WebDriver driver   = context.getWebDriver();
+		final WebDriverWait wait = new WebDriverWait(driver, actualTime);
+		final By bySelector      = By.cssSelector(selector);
 
-		try {
-
-			return new WebDriverWait(driver, actualTime).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector(selector), 0));
-
-		} catch (TimeoutException e) {}
+		try { wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(bySelector)); } catch (TimeoutException e) {}
+		try { return wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(bySelector, 0)); } catch (TimeoutException e) {}
 
 		return null;
 	}
@@ -116,14 +114,13 @@ public abstract class Command {
 
 	protected List<WebElement> name(final String name, final int waitTimeInSeconds) {
 
-		final int actualTime   = waitTimeInSeconds > 0 ? waitTimeInSeconds : waitTime;
-		final WebDriver driver = context.getWebDriver();
+		final int actualTime     = waitTimeInSeconds > 0 ? waitTimeInSeconds : waitTime;
+		final WebDriver driver   = context.getWebDriver();
+		final WebDriverWait wait = new WebDriverWait(driver, actualTime);
+		final By byName          = By.name(name);
 
-		try {
-
-			return new WebDriverWait(driver, actualTime).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.name(name), 0));
-
-		} catch (TimeoutException e) {}
+		try { wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(byName)); } catch (TimeoutException e) {}
+		try { return wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(byName, 0)); } catch (TimeoutException e) {}
 
 		return null;
 	}
@@ -134,14 +131,13 @@ public abstract class Command {
 
 	protected List<WebElement> className(final String name, final int waitTimeInSeconds) {
 
-		final int actualTime   = waitTimeInSeconds > 0 ? waitTimeInSeconds : waitTime;
-		final WebDriver driver = context.getWebDriver();
+		final int actualTime     = waitTimeInSeconds > 0 ? waitTimeInSeconds : waitTime;
+		final WebDriver driver   = context.getWebDriver();
+		final WebDriverWait wait = new WebDriverWait(driver, actualTime);
+		final By byClassName     = By.className(name);
 
-		try {
-
-			return new WebDriverWait(driver, actualTime).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.className(name), 0));
-
-		} catch (TimeoutException e) {}
+		try { wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(byClassName)); } catch (TimeoutException e) {}
+		try { return wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(byClassName, 0)); } catch (TimeoutException e) {}
 
 		return null;
 	}
@@ -154,12 +150,11 @@ public abstract class Command {
 
 		final int actualTime   = waitTimeInSeconds > 0 ? waitTimeInSeconds : waitTime;
 		final WebDriver driver = context.getWebDriver();
-
-		try {
-
-			return new WebDriverWait(driver, actualTime).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.xpath("//*[text()='" + text + "']"), 0));
-
-		} catch (TimeoutException e) {}
+		final WebDriverWait wait    = new WebDriverWait(driver, actualTime);
+		final By byXpath            = By.xpath("//*[text()='" + text + "']");
+			
+		try { wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(byXpath)); } catch (TimeoutException e) {}
+		try { return wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(byXpath, 0)); } catch (TimeoutException e) {}
 
 		return null;
 	}
@@ -170,14 +165,13 @@ public abstract class Command {
 
 	protected List<WebElement> tagName(final String name, final int waitTimeInSeconds) {
 
-		final int actualTime   = waitTimeInSeconds > 0 ? waitTimeInSeconds : waitTime;
-		final WebDriver driver = context.getWebDriver();
+		final int actualTime     = waitTimeInSeconds > 0 ? waitTimeInSeconds : waitTime;
+		final WebDriver driver   = context.getWebDriver();
+		final WebDriverWait wait = new WebDriverWait(driver, actualTime);
+		final By byTagName       = By.tagName(name);
 
-		try {
-
-			return new WebDriverWait(driver, actualTime).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.tagName(name), 0));
-
-		} catch (TimeoutException e) {}
+		try { wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(byTagName)); } catch (TimeoutException e) {}
+		try {return wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(byTagName, 0)); } catch (TimeoutException e) {}
 
 		return null;
 	}

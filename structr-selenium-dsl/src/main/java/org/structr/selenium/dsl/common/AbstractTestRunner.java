@@ -14,12 +14,9 @@ public abstract class AbstractTestRunner {
 
 	protected final Terminal terminal = new NoninteractiveTerminal();
 	protected Context context         = null;
-	protected int width               = 0;
 
-	public AbstractTestRunner(final Context context, final int width) {
-
+	public AbstractTestRunner(final Context context) {
 		this.context = context;
-		this.width   = width;
 	}
 
 	// ----- public static methods -----

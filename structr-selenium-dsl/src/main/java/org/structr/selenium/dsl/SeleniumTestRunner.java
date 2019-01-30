@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -37,6 +39,8 @@ public class SeleniumTestRunner {
 
 	public SeleniumTestRunner(final Queue<String> args) throws IOException {
 		init(args);
+
+		Logger.getLogger("org.openqa.selenium.interactions.Actions").setLevel(Level.WARNING);
 	}
 
 	public static void main(final String[] args) {
@@ -88,7 +92,7 @@ public class SeleniumTestRunner {
 				context.setCurrentScript(new ScriptFile(suiteDir.getAbsolutePath()));
 			}
 
-			return new InteractiveTestRunner(context, width).run();
+			return new InteractiveTestRunner(context).run();
 
 		} else {
 
@@ -100,8 +104,8 @@ public class SeleniumTestRunner {
 
 		try {
 
-			final SideFileRunner sideRunner     = new SideFileRunner(context, width);
-			final ScriptFileRunner scriptRunner = new ScriptFileRunner(context, width);
+			final SideFileRunner sideRunner     = new SideFileRunner(context);
+			final ScriptFileRunner scriptRunner = new ScriptFileRunner(context);
 			final Path root                     = suiteDir.toPath();
 
 			Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
@@ -122,10 +126,10 @@ public class SeleniumTestRunner {
 				}
 			});
 
-			final int tests  = sideRunner.getTests() + scriptRunner.getTests();
-			final int passed = sideRunner.getPassed() + scriptRunner.getPassed();
-			final int failed = sideRunner.getFailed() + scriptRunner.getFailed();
-			final int errors = sideRunner.getErrors() + scriptRunner.getErrors();
+			final int tests  = context.getTests();
+			final int passed = context.getPassed();
+			final int failed = context.getFailed();
+			final int errors = context.getErrors();
 
 			System.out.println("Summary: " + tests + " test" + (tests == 1 ? "" : "s") + " executed, " + passed + "/" + (passed + failed) + " assertions passed, " + errors + " errors.");
 
@@ -211,14 +215,14 @@ public class SeleniumTestRunner {
 		}
 
 		this.driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
-		this.context = new Context(new CommandFactory(), driver, new Actions(driver));
+		this.context = new Context(new CommandFactory(), driver, new Actions(driver), width);
 	}
 
 	private void initFirefox() {
 
 		final FirefoxOptions firefoxOptions = new FirefoxOptions();
 
-		firefoxOptions.setHeadless(!headless);
+		firefoxOptions.setHeadless(headless);
 		firefoxOptions.addPreference("webdriver.log.driver", "OFF");
 
 		System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");

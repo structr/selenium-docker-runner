@@ -6,8 +6,7 @@
 
 package org.structr.selenium.dsl.action;
 
-import org.structr.selenium.dsl.command.Command;
-import org.structr.selenium.dsl.command.CommandFactory;
+import java.nio.file.Paths;
 import org.structr.selenium.dsl.runner.script.ScriptFile;
 import org.structr.selenium.dsl.token.TokenQueue;
 import org.structr.selenium.dsl.runner.interactive.Terminal;
@@ -16,7 +15,7 @@ import org.structr.selenium.dsl.runner.interactive.Terminal;
  */
 public class RunCommand extends AbstractScriptAction {
 
-	private String path = null;
+	private String name = null;
 
 	public RunCommand() {
 		super();
@@ -24,28 +23,24 @@ public class RunCommand extends AbstractScriptAction {
 
 	@Override
 	public void init(final TokenQueue args) {
-		path = args.string(context, true);
+		name = args.string(context, true);
 	}
 
 	@Override
 	public boolean execute(final Terminal out) {
 
-		final ScriptFile file = getScriptFile(path);
-		int lineNumber        = 1;
+		final ScriptFile file = getScriptFile(name);
+		int lineNumber        = 0;
+
+		out.println();
+		out.setInteractive(false);
 
 		for (final String line : file.getLines()) {
 
-			// pad left
-			if (lineNumber <   10) { out.print(" "); }
-			if (lineNumber <  100) { out.print(" "); }
-			if (lineNumber < 1000) { out.print(" "); }
-
-			out.println(lineNumber, ": ", line);
-
-			if (!run(line, out, lineNumber++)) {
-				break;
-			}
+			context.runLine(out, line, ++lineNumber, 5);
 		}
+		
+		out.setInteractive(true);
 
 		return true;
 	}
@@ -65,57 +60,11 @@ public class RunCommand extends AbstractScriptAction {
 		return false;
 	}
 
-	// ----- private methods -----
-	private boolean run(final String line, final Terminal output, final int lineNumber) {
-
-		try {
-
-			final CommandFactory factory = context.getCommandFactory();
-			final Command command        = factory.fromLine(context, lineNumber, line);
-			final String trimmed         = line.trim();
-
-			if (command != null) {
-
-				if (command instanceof AbstractAction) {
-
-					final AbstractAction action = (AbstractAction)command;
-
-					if (!command.execute(output)) {
-
-						output.printlnRed("FAILED: " + action.getErrorMessage());
-
-						return false;
-					}
-
-				} else {
-
-					output.printlnRed("Error: command must be either action or assertion.");
-
-					return false;
-				}
-
-			} else {
-
-				output.printlnRed("Error: unknown command \"" + trimmed + "\"");
-
-				return false;
-			}
-
-		} catch (Throwable t) {
-
-			output.printlnRed(t.getMessage());
-
-			return false;
-		}
-
-		return true;
-	}
-
 	private ScriptFile getScriptFile(final String path) {
 
 		if (path != null) {
 
-			return new ScriptFile(path);
+			return new ScriptFile(context.getPathRelativeToWorkDir(Paths.get(path)).toString());
 		}
 
 		final Object f = context.getDefined("script");

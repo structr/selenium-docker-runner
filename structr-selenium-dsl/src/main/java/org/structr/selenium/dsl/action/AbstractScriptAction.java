@@ -30,17 +30,27 @@ public abstract class AbstractScriptAction extends AbstractAction {
 		if (part != null) {
 
 			final List<Completion> results = new LinkedList<>();
-			Path startDir                  = Paths.get(part);
+			Path startDir                  = context.getPathRelativeToWorkDir(Paths.get(part));
 
 			if (!Files.isDirectory(startDir)) {
 				startDir = startDir.getParent();
 			}
 
+			final boolean isAbsolute = part.startsWith("/");
+			final Path work          = context.getWorkDirectory() != null ? context.getWorkDirectory().toPath() : startDir;
+
 			try {
 
 				final List<Completion> list = Files.find(startDir, 1, (t, u) -> {
 
-					return t.toString().startsWith(part);
+					if (isAbsolute) {
+
+						return t.toString().startsWith(part);
+						
+					} else {
+
+						return work.relativize(t).toString().startsWith(part);
+					}
 
 				}).map((t) -> {
 
@@ -49,14 +59,28 @@ public abstract class AbstractScriptAction extends AbstractAction {
 						final Path fileName = t.getFileName();
 						if (fileName != null) {
 
-							final String displayValue = fileName.toString();
-							final String value        = t.toString();
+							if (isAbsolute) {
 
-							if (Files.isDirectory(t)) {
-								return new Completion(displayValue, value + "/", false);
+								final String displayValue = fileName.toString();
+								final String value        = t.toString();
+
+								if (Files.isDirectory(t)) {
+									return new Completion(displayValue, value + "/", false);
+								}
+
+								return new Completion(displayValue, value, false);
+								
+							} else {
+
+								final String value = work.relativize(t).toString();
+
+								if (Files.isDirectory(t)) {
+									return new Completion(value, value + "/", false);
+								}
+
+								return new Completion(value, value, false);
+								
 							}
-
-							return new Completion(displayValue, value, false);
 						}
 					}
 
