@@ -30,7 +30,7 @@ public class LoadCommand extends AbstractScriptAction {
 	@Override
 	public boolean execute(final Terminal out) {
 
-		final Path path             = context.getPathRelativeToWorkDir(Paths.get(name));
+		final Path path             = getWorkDir().resolve(Paths.get(name));
 		final ScriptFile scriptFile = new ScriptFile(path.toString());
 
 		context.undefine("script");

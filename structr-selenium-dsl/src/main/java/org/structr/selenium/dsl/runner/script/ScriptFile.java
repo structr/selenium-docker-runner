@@ -7,6 +7,7 @@
 package org.structr.selenium.dsl.runner.script;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -97,5 +98,9 @@ public class ScriptFile {
 
 			throw new IllegalArgumentException(ioex.getMessage());
 		}
+	}
+
+	public File getContainingDirectory() {
+		return new File(path).getParentFile();
 	}
 }

@@ -1,16 +1,11 @@
 package org.structr.selenium.dsl.command;
 
 import org.structr.selenium.dsl.token.TokenQueue;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -152,7 +147,7 @@ public abstract class Command {
 		final WebDriver driver = context.getWebDriver();
 		final WebDriverWait wait    = new WebDriverWait(driver, actualTime);
 		final By byXpath            = By.xpath("//*[text()='" + text + "']");
-			
+
 		try { wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(byXpath)); } catch (TimeoutException e) {}
 		try { return wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(byXpath, 0)); } catch (TimeoutException e) {}
 
@@ -228,27 +223,6 @@ public abstract class Command {
 
 	protected void delay(final long milliseconds) {
 		try { Thread.sleep(milliseconds); } catch (InterruptedException iex) {}
-	}
-
-	protected void takeScreenshot(final String path) throws IOException {
-
-		final WebDriver driver = context.getWebDriver();
-		final File scrFile     = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-
-		Files.move(scrFile.toPath(), new File(path).toPath());
-	}
-
-	protected void takeScreenshot() {
-
-		try {
-
-			new File("/tmp/screenshots").mkdirs();
-			takeScreenshot("/tmp/screenshots/selenium-" + System.currentTimeMillis() + "-" + sequence++ + ".png");
-
-		} catch (IOException ioex) {
-
-			ioex.printStackTrace();
-		}
 	}
 
 	// interaction

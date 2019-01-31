@@ -43,10 +43,12 @@ public class StepCommand extends AbstractAction {
 			while (!finished && currentLine < lines.size()) {
 
 				final String line = lines.get(currentLine);
-				
+
 				if (line.length() > 0 && !line.startsWith("#")) {
 
-					context.runLine(out, line, currentLine + 1, 0);
+					if (!context.runLine(out, line, currentLine + 1)) {
+						break;
+					}
 
 					// file done?
 					if (currentLine >= lines.size()) {

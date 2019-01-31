@@ -6,6 +6,7 @@
 
 package org.structr.selenium.dsl.action;
 
+import java.io.File;
 import java.nio.file.Paths;
 import org.structr.selenium.dsl.runner.script.ScriptFile;
 import org.structr.selenium.dsl.token.TokenQueue;
@@ -29,18 +30,29 @@ public class RunCommand extends AbstractScriptAction {
 	@Override
 	public boolean execute(final Terminal out) {
 
-		final ScriptFile file = getScriptFile(name);
-		int lineNumber        = 0;
+		final File currentWorkDir   = context.getWorkDirectory();
+		final boolean isInteractive = out.isInteractive();
+		final ScriptFile file       = getScriptFile(name);
+		int lineNumber              = 0;
 
 		out.println();
 		out.setInteractive(false);
 
+		// enter directory of script file
+		context.setWorkDirectory(file.getContainingDirectory());
+		context.increaseIndent();
+
 		for (final String line : file.getLines()) {
 
-			context.runLine(out, line, ++lineNumber, 5);
+			if (!context.runLine(out, line, ++lineNumber)) {
+				break;
+			}
 		}
-		
-		out.setInteractive(true);
+
+		// restore previous state
+		out.setInteractive(isInteractive);
+		context.setWorkDirectory(currentWorkDir);
+		context.decreaseIndent();
 
 		return true;
 	}
@@ -64,7 +76,7 @@ public class RunCommand extends AbstractScriptAction {
 
 		if (path != null) {
 
-			return new ScriptFile(context.getPathRelativeToWorkDir(Paths.get(path)).toString());
+			return new ScriptFile(getWorkDir().resolve(Paths.get(path)).toString());
 		}
 
 		final Object f = context.getDefined("script");

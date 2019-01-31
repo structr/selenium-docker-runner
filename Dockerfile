@@ -7,4 +7,4 @@ RUN cp geckodriver /usr/local/bin
 COPY structr-selenium-dsl-0.1-SNAPSHOT.jar /root
 ENV MOZ_HEADLESS 1
 WORKDIR /root
-CMD java -jar structr-selenium-dsl-0.1-SNAPSHOT.jar -b firefox /tmp/testsuite
+CMD java -jar structr-selenium-dsl-0.1-SNAPSHOT.jar -e firefox /tmp/testsuite -u "http://structr:8082"

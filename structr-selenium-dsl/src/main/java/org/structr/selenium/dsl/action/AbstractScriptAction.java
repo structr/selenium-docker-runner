@@ -6,6 +6,7 @@
 
 package org.structr.selenium.dsl.action;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,14 +31,13 @@ public abstract class AbstractScriptAction extends AbstractAction {
 		if (part != null) {
 
 			final List<Completion> results = new LinkedList<>();
-			Path startDir                  = context.getPathRelativeToWorkDir(Paths.get(part));
+			final boolean isAbsolute       = part.startsWith("/");
+			final Path baseDir             = getWorkDir();
+			Path startDir                  = baseDir.resolve(Paths.get(part)).toAbsolutePath();
 
-			if (!Files.isDirectory(startDir)) {
+			if (!Files.isDirectory(startDir) && startDir.getParent() != null) {
 				startDir = startDir.getParent();
 			}
-
-			final boolean isAbsolute = part.startsWith("/");
-			final Path work          = context.getWorkDirectory() != null ? context.getWorkDirectory().toPath() : startDir;
 
 			try {
 
@@ -46,10 +46,10 @@ public abstract class AbstractScriptAction extends AbstractAction {
 					if (isAbsolute) {
 
 						return t.toString().startsWith(part);
-						
+
 					} else {
 
-						return work.relativize(t).toString().startsWith(part);
+						return baseDir.relativize(t).toString().startsWith(part);
 					}
 
 				}).map((t) -> {
@@ -69,17 +69,17 @@ public abstract class AbstractScriptAction extends AbstractAction {
 								}
 
 								return new Completion(displayValue, value, false);
-								
+
 							} else {
 
-								final String value = work.relativize(t).toString();
+								final String value = baseDir.relativize(t).toString();
 
 								if (Files.isDirectory(t)) {
 									return new Completion(value, value + "/", false);
 								}
 
 								return new Completion(value, value, false);
-								
+
 							}
 						}
 					}
@@ -101,5 +101,17 @@ public abstract class AbstractScriptAction extends AbstractAction {
 		}
 
 		return null;
+	}
+
+	// ----- protected methods -----
+	protected Path getWorkDir() {
+
+		final File workDir = context.getWorkDirectory();
+		if (workDir != null) {
+
+			return workDir.toPath().toAbsolutePath();
+		}
+
+		return Paths.get("").toAbsolutePath();
 	}
 }

@@ -2,10 +2,12 @@ package org.structr.selenium.dsl.common;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.structr.selenium.dsl.action.AbstractAction;
@@ -22,12 +24,15 @@ import org.structr.selenium.dsl.runner.side.SideTest;
 public class Context {
 
 	private final Map<String, Object> data = new LinkedHashMap<>();
+	private final int indentStep           = 5;
 	private boolean recordingEnabled       = false;
 	private boolean executeNextLine        = true;
 	private CommandFactory factory         = null;
 	private WebDriver driver               = null;
 	private Actions actions                = null;
 	private File workDir                   = null;
+	private int sequence                   = 0;
+	private int indent                     = 0;
 	private int width                      = 0;
 	private int tests                      = 0;
 	private int errors                     = 0;
@@ -107,27 +112,17 @@ public class Context {
 		return workDir;
 	}
 
-	public Path getPathRelativeToWorkDir(final Path p) {
-
-		if (workDir != null) {
-
-			final Path work = workDir.toPath();
-
-			return work.resolve(p);
-		}
-
-		return p;
-	}
-
-	public void runLine(final Terminal terminal, final String line, final int lineNumber, final int indent) {
+	public boolean runLine(final Terminal terminal, final String line, final int lineNumber) {
 
 		final String trimmed  = line.trim();
 		final int left        = width - trimmed.length() - 7 - indent;
+		boolean success       = true;
 
 		if (trimmed.length() > 0 && !trimmed.startsWith("#")) {
 
+
 			terminal.print(StringUtils.leftPad("", indent));
-			
+
 			if (lineNumber > 0) {
 				terminal.print(pad(lineNumber, 3, " ") + ": " + trimmed);
 			}
@@ -148,7 +143,9 @@ public class Context {
 							if (!terminal.isInteractive()) {
 								terminal.println(pad("OK", left, " "));
 							}
-							
+
+							success = true;
+
 						} else if (command instanceof AbstractAction) {
 
 							final AbstractAction action = (AbstractAction)command;
@@ -158,7 +155,7 @@ public class Context {
 								passed++;
 
 								if (!terminal.receivedOutput() && !terminal.isInteractive()) {
-									
+
 									terminal.println(pad("OK", left, " "));
 								}
 
@@ -167,11 +164,13 @@ public class Context {
 								failed++;
 
 								if (!terminal.receivedOutput() && !terminal.isInteractive()) {
-									
+
 									terminal.println(pad("FAILED", left, " "));
 								}
 
 								terminal.println(action.getErrorMessage());
+
+								success = false;
 							}
 
 						} else {
@@ -184,14 +183,16 @@ public class Context {
 							}
 
 							terminal.println("Error: command must be either action or assertion.");
+
+							success = false;
 						}
-						
+
 					} else {
 
 						if (!terminal.isInteractive()) {
 							terminal.println(pad("SKIPPED", left, " "));
 						}
-						
+
 						// reset if condition
 						executeNextLine = true;
 					}
@@ -202,8 +203,10 @@ public class Context {
 
 						terminal.println(pad("ERROR", left, " "));
 					}
-					
+
 					terminal.println("Error: unknown command \"" + trimmed + "\"");
+
+					success = false;
 				}
 
 			} catch (Throwable t) {
@@ -213,10 +216,16 @@ public class Context {
 				if (!terminal.isInteractive()) {
 
 					terminal.println(pad("ERROR", left, " "));
-					terminal.println(t.getMessage());
 				}
+
+				terminal.println(t.getMessage());
+
+				success = false;
 			}
+
 		}
+
+		return success;
 	}
 
 	public void runSide(final Terminal terminal, final SideTest test, final int lineNumber) {
@@ -302,5 +311,41 @@ public class Context {
 
 	public int getWidth() {
 		return width;
+	}
+
+	public void setIndent(final int indent) {
+		this.indent = indent;
+	}
+
+	public int getIndent() {
+		return indent;
+	}
+
+	public void increaseIndent() {
+		this.indent += indentStep;
+	}
+
+	public void decreaseIndent() {
+		this.indent -= indentStep;
+	}
+
+	public void takeScreenshot(final String path) throws IOException {
+
+		final File scrFile     = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+
+		Files.move(scrFile.toPath(), new File(path).toPath());
+	}
+
+	public void takeScreenshot() {
+
+		try {
+
+			new File("/tmp/screenshots").mkdirs();
+			takeScreenshot("/tmp/screenshots/selenium-" + System.currentTimeMillis() + "-" + sequence++ + ".png");
+
+		} catch (IOException ioex) {
+
+			ioex.printStackTrace();
+		}
 	}
 }

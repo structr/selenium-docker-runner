@@ -29,6 +29,8 @@ public class ScriptFileRunner extends AbstractTestRunner {
 		final String end   = "END " + name + " ";
 		final int width    = context.getWidth();
 
+		context.setWorkDirectory(sourcePath.getParent().toFile());
+
 		terminal.println(start, pad("", width - start.length() - 1, "#"));
 
 		// count # of tests
@@ -41,7 +43,11 @@ public class ScriptFileRunner extends AbstractTestRunner {
 
 			for (final String line : lines) {
 
-				context.runLine(terminal, line, ++lineNumber, 0);
+				if (!context.runLine(terminal, line, ++lineNumber)) {
+
+					context.takeScreenshot();
+					break;
+				}
 			}
 
 		} catch (IOException ioex) {

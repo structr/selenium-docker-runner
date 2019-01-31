@@ -37,14 +37,14 @@ public class SaveCommand extends AbstractScriptAction {
 
 				if (path != null) {
 
-					final File file = context.getPathRelativeToWorkDir(Paths.get(path)).toFile();
+					final File file = getWorkDir().resolve(Paths.get(path)).toFile();
 
 					if (!file.exists() || out.prompt("File exists, overwrite? (y/n) ") ) {
-						
+
 						scriptFile.setPath(path);
 						scriptFile.save();
 					}
-					
+
 				} else {
 
 					out.println("Script file has no path yet, please provide path parameter.");

@@ -113,11 +113,13 @@ public class SeleniumTestRunner {
 				@Override
 				public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
 
-					if (file.getFileName().toString().toLowerCase().endsWith(".side")) {
+					final String fileName = file.getFileName().toString();
+
+					if (fileName.endsWith(".side")) {
 
 						sideRunner.runSideFile(root, file);
 
-					} else {
+					} else if (fileName.endsWith(".test")) {
 
 						scriptRunner.runScriptFile(root, file);
 					}
@@ -150,8 +152,9 @@ public class SeleniumTestRunner {
 	// ----- private methods -----
 	private void init(final Queue<String> args) throws IOException {
 
-		String which = null;
-		String dir   = null;
+		String baseUrl = "http://localhost:11223";
+		String which   = null;
+		String dir     = null;
 
 		while (!args.isEmpty()) {
 
@@ -160,12 +163,16 @@ public class SeleniumTestRunner {
 
 				switch (current) {
 
-					case "-b":
-						which = getOrThrow(args.poll(), "Missing parameter for browser engine (-b).");
+					case "-e":
+						which = getOrThrow(args.poll(), "Missing parameter for browser engine (-e).");
 						break;
 
 					case "-i":
 						interactive = true;
+						break;
+
+					case "-u":
+						baseUrl = getOrThrow(args.poll(), "Missing parameter for base URL (-u).");
 						break;
 
 					case "-v":
@@ -183,7 +190,7 @@ public class SeleniumTestRunner {
 			}
 		}
 
-		getOrThrow(which, "Browser engine not specified, please use \"-b chrome\" or \"-b firefox\".");
+		getOrThrow(which, "Browser engine not specified, please use \"-e chrome\" or \"-e firefox\".");
 
 		if (!interactive) {
 
@@ -215,7 +222,10 @@ public class SeleniumTestRunner {
 		}
 
 		this.driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+
 		this.context = new Context(new CommandFactory(), driver, new Actions(driver), width);
+		this.context.setWorkDirectory(suiteDir);
+		this.context.define("baseUrl", baseUrl);
 	}
 
 	private void initFirefox() {

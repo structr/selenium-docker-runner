@@ -21,6 +21,7 @@ IMAGE_EXISTS=false
 DUMP_CONFIG=false
 RECORD=false
 NAME=structr:selenium
+EXIT_CODE=0
 
 function started() {
 	curl -si $BASE_URL:$PORT/structr/rest >/dev/null
@@ -71,8 +72,8 @@ while [ "$#" -gt 0 ]; do
 		-l) LOG="$2"; shift 2;;
 		-n) NAME="$2"; shift 2;;
 		-r) RECORD="true"; shift 1;;
-		-r) RECORD="true"; shift 1;;
 		-t) TESTSUITE="$2"; shift 2;;
+		-u) REUSE_EXISTING="false"; shift 1;;
 		-v) VERSION="$2"; shift 2;;
 		*)
 			echo "Error: unknown option $1"
@@ -148,7 +149,7 @@ if docker inspect --type=image $NAME >/dev/null 2>&1; then
 fi
 
 echo "Creating isolated network.." |tee -a $LOG
-docker network create $NETWORK >>$LOG || exit 1
+docker network create $NETWORK >>$LOG
 
 if [ "$IMAGE_EXISTS" == "true" ] && [ "$REUSE_EXISTING" == "true" ]; then
 
@@ -192,7 +193,10 @@ else
 
 	echo "Copying resources.." |tee -a $LOG
 	docker cp license.key $CONTAINER:/var/lib/structr/license.key >>$LOG || exit 1
-	docker cp $SOURCE $CONTAINER:/tmp/webapp >>$LOG || exit 1
+
+	if [ -n "$SOURCE" ]; then
+		docker cp $SOURCE $CONTAINER:/tmp/webapp >>$LOG || exit 1
+	fi
 
 	echo "Starting container.." |tee -a $LOG
 	docker start $CONTAINER >>$LOG
@@ -210,8 +214,10 @@ else
 		cancel
 	fi
 
-	echo "Deploying webapp from $SOURCE.." |tee -a $LOG
-	curl -si -HX-User:$USERNAME -HX-Password:$PASSWORD $BASE_URL:$PORT/structr/rest/maintenance/deploy -d '{ mode: import, source: "/tmp/webapp" }' >>$LOG || exit 1
+	if [ -n "$SOURCE" ]; then
+		echo "Deploying webapp from $SOURCE.." |tee -a $LOG
+		curl -si -HX-User:$USERNAME -HX-Password:$PASSWORD $BASE_URL:$PORT/structr/rest/maintenance/deploy -d '{ mode: import, source: "/tmp/webapp" }' >>$LOG || exit 1
+	fi
 
 	echo "Storing Structr image for later use.." |tee -a $LOG
 	docker commit $CONTAINER $NAME >>$LOG || exit 1
@@ -243,15 +249,21 @@ else
 	#
 
 	echo "Creating test image.." |tee -a $LOG
-	docker image build -q -t selenium-test . >>$LOG || exit 1
+	#docker image build -q -t selenium-test . >>$LOG || exit 1
+	docker image build -q -t selenium-test .
 
 	echo "Creating test container.." |tee -a $LOG
 	TESTCONTAINER=$(docker create --network $NETWORK --shm-size=2g selenium-test)
 	docker cp $TESTSUITE $TESTCONTAINER:/tmp/testsuite >>$LOG || exit 1
 	docker start -a $TESTCONTAINER |tee -a $LOG || exit 1
 
-	echo "Downloading server.log.."
-	docker exec -ti $CONTAINER /bin/sh -c 'cat /var/lib/structr/logs/server.log' >server.log
+	EXIT_CODE=$(docker inspect $TESTCONTAINER --format='{{.State.ExitCode}}')
+	if [ $EXIT_CODE -gt 0 ]; then
+
+		echo "Downloading server.log and screenshots"
+		docker exec -ti $CONTAINER /bin/sh -c 'cat /var/lib/structr/logs/server.log' >server.log
+		docker cp $TESTCONTAINER:/tmp/screenshots . >>$LOG
+	fi
 
 	echo "Stopping containers.." |tee -a $LOG
 	docker stop $CONTAINER >>$LOG || exit 1
@@ -266,3 +278,4 @@ fi
 echo "Removing isolated network" |tee -a $LOG
 docker network rm $NETWORK >>$LOG || exit 1
 
+exit $EXIT_CODE

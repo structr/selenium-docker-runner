@@ -26,7 +26,6 @@ import org.structr.selenium.dsl.action.AbstractAction;
 import org.structr.selenium.dsl.command.Command;
 import org.structr.selenium.dsl.command.CommandFactory;
 import org.structr.selenium.dsl.common.AbstractTestRunner;
-import org.structr.selenium.dsl.runner.script.ScriptFile;
 import org.structr.selenium.dsl.token.TokenQueue;
 
 /**
@@ -120,7 +119,7 @@ public class InteractiveTestRunner extends AbstractTestRunner implements Termina
 				return;
 			}
 
-			context.runLine(term, trimmed, -1, 0);
+			context.runLine(term, trimmed, -1);
 			commandHistory.add(trimmed);
 		}
 	}
