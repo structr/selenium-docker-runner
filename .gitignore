@@ -1,5 +1,6 @@
 **/.structr-selenium-runner
 **/server.log
+license.key
 structr-selenium-dsl/nbactions.xml
 structr-selenium-dsl/nbproject/
 structr-selenium-dsl/target/
