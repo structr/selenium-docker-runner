@@ -1,33 +1,31 @@
 # selenium-docker-runner
 
 ### Prerequisites
-- Selenium IDE
 - Docker
-- curl
 
 ### Usage
 
-    test.sh <Structr deployment repository> <testsuite.side>
-    
-### Note
-In order for an exported .side file to be usable with the automatic test setup, a small change must be made to the exported file:
+	Usage
+	    test.sh [-c] [-d <webapp>] [-h] [-n <image name>] [-l <logfile>] [-r] [-u] [-v <version> [-t <testsuite>]
 
-    {
-      "id": "b10bb8b4-d9a2-48ca-9212-1060ae91649e",
-      "version": "1.1",
-      "name": "demo1",
-      "url": "http://localhost:8082",
-          "tests": [{...
+	Options
+	    -c              - dump configuration and exit
+	    -d <webapp>     - deploy the webapp from the given directory
+	    -h              - print this message and exit
+	    -l <logfile>    - use given log file (default: /dev/null)
+	    -n <image name> - use given test image name (default: structr:selenium)
+	    -r              - recording mode (dont run tests, just start the instance)
+	    -t <testsuite>  - run tests in the given directory
+	    -u              - update test image (don't resuse existing images)
+	    -v <version>    - use given Structr version (default: 3.1.1)
 
-becomes
+	Docker reference
+	    list containers         - docker container ls [-a]
+	    run shell on container  - docker exec -ti <name> /bin/sh
+	    list images             - docker image ls [-a]
+	    manage containers       - docker container rm <name> | create <name> | start <name> | stop <name>
+	    manage images           - docker image rm <id> | create | start <id> | stop <id>
+	    manage networks         - docker network ls | rm | create | start <name> | stop <name>
+	    fetch logs / stdout     - docker logs [-f] <name>
 
-    {
-      "id": "b10bb8b4-d9a2-48ca-9212-1060ae91649e",
-      "version": "1.1",
-      "name": "demo1",
-      "url": "http://structr:8082",
-          "tests": [{...
-          
 
-### Selenium IDE Download
-https://www.seleniumhq.org/selenium-ide/
