@@ -192,7 +192,10 @@ else
 	echo "Container: $CONTAINER"
 
 	echo "Copying resources.." |tee -a $LOG
-	docker cp license.key $CONTAINER:/var/lib/structr/license.key >>$LOG || exit 1
+
+	if [ -e license.key ]; then
+		docker cp license.key $CONTAINER:/var/lib/structr/license.key >>$LOG || exit 1
+	fi
 
 	if [ -n "$SOURCE" ]; then
 		docker cp $SOURCE $CONTAINER:/tmp/webapp >>$LOG || exit 1
