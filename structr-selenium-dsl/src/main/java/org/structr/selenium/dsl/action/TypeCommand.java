@@ -25,7 +25,7 @@ public class TypeCommand extends AbstractSelectorAction {
 
 	@Override
 	public void init(final TokenQueue args) {
-		selector = args.multiElementSelector(context, false);
+		selector = args.abstractSelector(context, false);
 		text     = args.string(context, false);
 	}
 

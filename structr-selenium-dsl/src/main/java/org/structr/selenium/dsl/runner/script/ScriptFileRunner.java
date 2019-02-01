@@ -31,7 +31,7 @@ public class ScriptFileRunner extends AbstractTestRunner {
 
 		context.setWorkDirectory(sourcePath.getParent().toFile());
 
-		terminal.println(start, pad("", width - start.length() - 1, "#"));
+		terminal.println(start, pad("", width - start.length() - 2, "#"));
 
 		// count # of tests
 		context.countTest();

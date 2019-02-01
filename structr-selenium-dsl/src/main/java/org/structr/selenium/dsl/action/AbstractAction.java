@@ -105,8 +105,8 @@ public abstract class AbstractAction extends Command {
 		return keys;
 	}
 
-	// ----- private methods -----
-	private void printOrThrow(final Terminal out, final String message) {
+	// ----- protected methods -----
+	protected void printOrThrow(final Terminal out, final String message) {
 
 		if (out.isInteractive()) {
 

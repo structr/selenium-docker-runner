@@ -8,14 +8,16 @@ package org.structr.selenium.dsl.selector;
 
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
+import java.util.Map;
 import org.structr.selenium.dsl.token.TokenQueue;
 import org.structr.selenium.dsl.runner.interactive.Terminal;
 
 /**
  */
-public class GetCommand extends AbstractSelector<Response> {
+public class GetCommand extends AbstractSelector {
 
-	private final StringBuilder url = new StringBuilder();
+	private String url  = null;
+	private String path = null;
 
 	public GetCommand() {
 		super();
@@ -23,10 +25,8 @@ public class GetCommand extends AbstractSelector<Response> {
 
 	@Override
 	public void init(final TokenQueue args) {
-
-		while (!args.isEmpty()) {
-			url.append(args.string(context, false));
-		}
+		url  = args.string(context, false);
+		path = args.string(context, true);
 	}
 
 	@Override
@@ -35,17 +35,41 @@ public class GetCommand extends AbstractSelector<Response> {
 	}
 
 	@Override
-	public Response get() {
-		return RestAssured.get(url.toString());
-	}
+	public Object get() {
 
-	@Override
-	public String getElementMessage() {
-		return "REST GET " + url.toString();
+		configureRest();
+
+		final Response response = RestAssured
+			.given()
+				.accept("application/json")
+				.header("X-User",     username)
+				.header("X-Password", password)
+			.then()
+			.get(url)
+			.andReturn();
+
+		if (response.getStatusCode() == 200) {
+
+			if (path != null) {
+
+				return response.jsonPath().get(path);
+
+			} else {
+
+				return response.as(Map.class);
+			}
+		}
+
+		throw new IllegalArgumentException(response.getStatusLine());
 	}
 
 	@Override
 	public String usage() {
-		return "get <url> - return the REST object under the given url - not yet supported.";
+		return "get <url> <jsonPath> - return the REST object from the given URL, transformed with an optional jsonPath selector.";
+	}
+
+	@Override
+	public String getElementMessage() {
+		return "";
 	}
 }

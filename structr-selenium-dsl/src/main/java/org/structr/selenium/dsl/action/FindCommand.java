@@ -24,7 +24,7 @@ public class FindCommand extends AbstractSelectorAction {
 
 	@Override
 	public void init(final TokenQueue args) {
-		selector = args.multiElementSelector(context, false);
+		selector = args.abstractSelector(context, false);
 	}
 
 	@Override

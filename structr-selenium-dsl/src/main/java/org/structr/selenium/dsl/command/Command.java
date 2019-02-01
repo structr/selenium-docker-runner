@@ -1,5 +1,6 @@
 package org.structr.selenium.dsl.command;
 
+import com.jayway.restassured.RestAssured;
 import org.structr.selenium.dsl.token.TokenQueue;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -29,6 +30,9 @@ public abstract class Command {
 	private static int sequence = 0;
 	private final int waitTime  = 3;
 	protected Context context   = null;
+	protected String baseUrl    = null;
+	protected String username   = null;
+	protected String password   = null;
 
 	public abstract boolean execute(final Terminal out);
 	public abstract void init(final TokenQueue args);
@@ -315,6 +319,28 @@ public abstract class Command {
 				collect(list, o);
 			}
 		}
+	}
+
+	protected void configureRest() {
+
+		baseUrl  = getStringOrThrow("baseUrl",  "token 'baseUrl' is not defined.");
+		username = getStringOrThrow("username", "token 'username' is not defined.");
+		password = getStringOrThrow("password", "token 'password' is not defined.");
+
+		// configure RestAssured
+		RestAssured.basePath = "/structr/rest";
+		RestAssured.baseURI  = baseUrl;
+	}
+
+	protected String getStringOrThrow(final String key, final String error) {
+
+		final String value = (String)context.getDefined(key);
+		if (value == null) {
+
+			throw new IllegalArgumentException(error);
+		}
+
+		return value;
 	}
 
 	// ----- error messages -----

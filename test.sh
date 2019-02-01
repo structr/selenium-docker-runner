@@ -11,7 +11,7 @@ BASE_URL=http://localhost
 PORT=11223
 USERNAME=admin
 PASSWORD=admin
-VERSION=3.1.1
+VERSION=3.2-SNAPSHOT
 NETWORK=selenium-tests
 MAX_TRIES=60
 WAIT=5
@@ -200,6 +200,8 @@ else
 	if [ -n "$SOURCE" ]; then
 		docker cp $SOURCE $CONTAINER:/tmp/webapp >>$LOG || exit 1
 	fi
+
+	docker cp structr.conf $CONTAINER:/var/lib/structr/structr.conf >>$LOG || exit 1
 
 	echo "Starting container.." |tee -a $LOG
 	docker start $CONTAINER >>$LOG

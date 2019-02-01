@@ -6,14 +6,18 @@
 
 package org.structr.selenium.dsl.action;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.util.Map;
 import org.structr.selenium.dsl.token.TokenQueue;
 import org.structr.selenium.dsl.runner.interactive.Terminal;
+import org.structr.selenium.dsl.selector.AbstractSelector;
 
 /**
  */
 public class PrintCommand extends AbstractAction {
 
-	final StringBuilder buf = new StringBuilder();
+	private AbstractSelector selector = null;
 
 	public PrintCommand() {
 		super();
@@ -21,20 +25,25 @@ public class PrintCommand extends AbstractAction {
 
 	@Override
 	public void init(final TokenQueue args) {
-
-		while (!args.isEmpty()) {
-
-			final String value = args.string(context, false);
-
-			buf.append(value);
-		}
+		selector = args.abstractSelector(context, false);
 	}
 
 	@Override
 	public boolean execute(final Terminal out) {
 
-		out.println();
-		out.println("Print: " + buf.toString());
+		final Object value = selector.get();
+
+		if (value instanceof Map || value instanceof Iterable) {
+
+			final Gson gson   = new GsonBuilder().setPrettyPrinting().create();
+			final String json = gson.toJson(value);
+
+			out.println(json);
+
+		} else {
+
+			out.println(value);
+		}
 
 		return true;
 	}
@@ -46,6 +55,6 @@ public class PrintCommand extends AbstractAction {
 
 	@Override
 	public String usage() {
-		return "print <...> - prints the given strings to the log file.";
+		return "print <selector> - prints the result of the given selector.";
 	}
 }

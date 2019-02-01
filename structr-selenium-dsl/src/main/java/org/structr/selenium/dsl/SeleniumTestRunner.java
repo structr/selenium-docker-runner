@@ -133,7 +133,7 @@ public class SeleniumTestRunner {
 			final int failed = context.getFailed();
 			final int errors = context.getErrors();
 
-			System.out.println("Summary: " + tests + " test" + (tests == 1 ? "" : "s") + " executed, " + passed + "/" + (passed + failed) + " assertions passed, " + errors + " errors.");
+			System.out.println("Summary: " + tests + " test" + (tests == 1 ? "" : "s") + " executed, " + passed + "/" + (passed + failed) + " commands succeeded, " + errors + " errors.");
 
 			return failed + errors;
 

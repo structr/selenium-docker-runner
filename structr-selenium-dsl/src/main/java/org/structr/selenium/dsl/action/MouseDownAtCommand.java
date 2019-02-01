@@ -26,7 +26,7 @@ public class MouseDownAtCommand extends AbstractSelectorAction {
 
 	@Override
 	public void init(final TokenQueue args) {
-		selector = args.multiElementSelector(context, false);
+		selector = args.abstractSelector(context, false);
 
 		final int x = Math.max(0, args.number(context, true));
 		final int y = Math.max(0, args.number(context, true));

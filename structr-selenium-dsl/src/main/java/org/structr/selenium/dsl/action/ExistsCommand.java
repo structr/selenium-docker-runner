@@ -22,18 +22,17 @@ public class ExistsCommand extends AbstractSelectorAction {
 
 	@Override
 	public void init(final TokenQueue args) {
-		selector = args.multiElementSelector(context, false);
+		selector = args.abstractSelector(context, false);
 	}
 
 	@Override
 	public boolean execute(final Terminal out) {
-	
 		return collect(selector.get()).size() > 0;
 	}
 
 	@Override
 	public String getErrorMessage() {
-		return null;
+		return selector.getElementMessage() + " not found";
 	}
 
 	@Override

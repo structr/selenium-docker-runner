@@ -26,7 +26,7 @@ public class ChildCommand extends MultiElementSelector {
 	@Override
 	public void init(final TokenQueue args) {
 		index    = args.number(context, false);
-		selector = args.multiElementSelector(context, false);
+		selector = args.abstractSelector(context, false);
 	}
 
 	@Override

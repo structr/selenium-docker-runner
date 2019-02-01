@@ -66,12 +66,6 @@ public class Context {
 	}
 
 	public void define(final String name, final Object value) {
-
-		if (data.containsKey(name)) {
-
-			throw new IllegalArgumentException("Error: " + name + " already defined.");
-		}
-
 		data.put(name, value);
 	}
 

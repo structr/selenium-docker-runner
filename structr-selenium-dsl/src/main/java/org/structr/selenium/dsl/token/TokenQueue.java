@@ -132,7 +132,7 @@ public class TokenQueue {
 		return -1;
 	}
 
-	public AbstractSelector multiElementSelector(final Context context, final boolean optional) {
+	public AbstractSelector abstractSelector(final Context context, final boolean optional) {
 
 		final Command command = command(context, optional);
 
