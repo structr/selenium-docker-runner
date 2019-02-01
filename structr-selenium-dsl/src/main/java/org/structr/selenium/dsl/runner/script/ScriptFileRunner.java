@@ -54,6 +54,6 @@ public class ScriptFileRunner extends AbstractTestRunner {
 			ioex.printStackTrace();
 		}
 
-		terminal.println(end + pad("", width - end.length() - 1, "#"));
+		terminal.println(end + pad("", width - end.length() - 2, "#"));
 	}
 }

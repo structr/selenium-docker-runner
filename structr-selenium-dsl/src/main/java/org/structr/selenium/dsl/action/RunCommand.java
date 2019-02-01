@@ -31,6 +31,7 @@ public class RunCommand extends AbstractScriptAction {
 	public boolean execute(final Terminal out) {
 
 		final File currentWorkDir   = context.getWorkDirectory();
+		final boolean isRecording   = context.isRecording();
 		final boolean isInteractive = out.isInteractive();
 		final ScriptFile file       = getScriptFile(name);
 		int lineNumber              = 0;
@@ -40,6 +41,7 @@ public class RunCommand extends AbstractScriptAction {
 
 		// enter directory of script file
 		context.setWorkDirectory(file.getContainingDirectory());
+		context.setRecording(false);
 		context.increaseIndent();
 
 		for (final String line : file.getLines()) {
@@ -52,6 +54,7 @@ public class RunCommand extends AbstractScriptAction {
 		// restore previous state
 		out.setInteractive(isInteractive);
 		context.setWorkDirectory(currentWorkDir);
+		context.setRecording(isRecording);
 		context.decreaseIndent();
 
 		return true;
@@ -69,7 +72,7 @@ public class RunCommand extends AbstractScriptAction {
 
 	@Override
 	public boolean isRecordable() {
-		return false;
+		return true;
 	}
 
 	private ScriptFile getScriptFile(final String path) {

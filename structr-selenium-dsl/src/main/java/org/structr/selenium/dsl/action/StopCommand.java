@@ -28,7 +28,7 @@ public class StopCommand extends AbstractAction {
 		final ScriptFile file = context.getCurrentScript();
 		if (file != null) {
 
-			context.stopRecording();
+			context.setRecording(false);
 
 			out.println("Recording stopped.");
 

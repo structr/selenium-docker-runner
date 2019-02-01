@@ -9,7 +9,6 @@ package org.structr.selenium.dsl.runner.side;
 import java.io.IOException;
 import java.nio.file.Path;
 import org.structr.selenium.dsl.common.Context;
-import org.structr.selenium.dsl.command.CommandFactory;
 import org.structr.selenium.dsl.common.AbstractTestRunner;
 
 /**
@@ -29,7 +28,7 @@ public class SideFileRunner extends AbstractTestRunner {
 		final String end   = "END " + name + " ";
 		final int width    = context.getWidth();
 
-		terminal.println(start + pad("", width - start.length() - 1, "#"));
+		terminal.println(start + pad("", width - start.length() - 2, "#"));
 
 		// count # of tests
 		context.countTest();
@@ -48,6 +47,6 @@ public class SideFileRunner extends AbstractTestRunner {
 			ioex.printStackTrace();
 		}
 
-		terminal.println(end + pad("", width - end.length() - 1, "#"));
+		terminal.println(end + pad("", width - end.length() - 2, "#"));
 	}
 }

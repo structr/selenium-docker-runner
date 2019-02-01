@@ -86,12 +86,8 @@ public class Context {
 		return (ScriptFile)data.get("script");
 	}
 
-	public void startRecording() {
-		this.recordingEnabled = true;
-	}
-
-	public void stopRecording() {
-		this.recordingEnabled = false;
+	public void setRecording(final boolean recording) {
+		this.recordingEnabled = recording;
 	}
 
 	public boolean isRecording() {
@@ -157,9 +153,21 @@ public class Context {
 
 								passed++;
 
-								if (!terminal.receivedOutput() && !terminal.isInteractive()) {
+								if (!terminal.isInteractive()) {
 
-									terminal.println(pad("OK", left, " "));
+									// only write OK if no other output was produced by the command
+									if (!terminal.receivedOutput()) {
+
+										terminal.println(pad("OK", left, " "));
+									}
+
+								} else {
+
+									if (recordingEnabled && action.isRecordable()) {
+
+										getCurrentScript().addCommand(line);
+										terminal.println("Action recorded.");
+									}
 								}
 
 							} else {
@@ -168,7 +176,7 @@ public class Context {
 
 								if (!terminal.receivedOutput() && !terminal.isInteractive()) {
 
-									terminal.println(pad("FAILED", left, " "));
+									terminal.println(pad("FAILED", left, "."));
 								}
 
 								terminal.println(action.getErrorMessage());
@@ -182,7 +190,7 @@ public class Context {
 
 							if (!terminal.isInteractive()) {
 
-								terminal.println(pad("ERROR", left, " "));
+								terminal.println(pad("ERROR", left, "."));
 							}
 
 							terminal.println("Error: command must be either action or assertion.");
@@ -204,7 +212,7 @@ public class Context {
 
 					if (!terminal.isInteractive()) {
 
-						terminal.println(pad("ERROR", left, " "));
+						terminal.println(pad("ERROR", left, "."));
 					}
 
 					terminal.println("Error: unknown command \"" + trimmed + "\"");
@@ -218,7 +226,7 @@ public class Context {
 
 				if (!terminal.isInteractive()) {
 
-					terminal.println(pad("ERROR", left, " "));
+					terminal.println(pad("ERROR", left, "."));
 				}
 
 				terminal.println(t.getMessage());
@@ -257,7 +265,7 @@ public class Context {
 
 						failed++;
 
-						terminal.println(pad("FAILED", left, " "));
+						terminal.println(pad("FAILED", left, "."));
 						terminal.println(action.getErrorMessage());
 					}
 
@@ -265,13 +273,13 @@ public class Context {
 
 					errors++;
 
-					terminal.println(pad("ERROR", left, " "));
+					terminal.println(pad("ERROR", left, "."));
 					terminal.println("Error: command must be either action or assertion.");
 				}
 
 			} else {
 
-				terminal.println(pad("ERROR", left, " "));
+				terminal.println(pad("ERROR", left, "."));
 				terminal.println("Error: unknown command \"" + trimmed + "\"");
 			}
 
@@ -279,7 +287,7 @@ public class Context {
 
 			errors++;
 
-			terminal.println(pad("ERROR", left, " "));
+			terminal.println(pad("ERROR", left, "."));
 
 			npe.printStackTrace();
 
@@ -287,7 +295,7 @@ public class Context {
 
 			errors++;
 
-			terminal.println(pad("ERROR", left, " "));
+			terminal.println(pad("ERROR", left, "."));
 			terminal.println(t.getMessage());
 		}
 	}

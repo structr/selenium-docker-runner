@@ -6,17 +6,16 @@
 
 package org.structr.selenium.dsl.action;
 
-import org.structr.selenium.dsl.action.AbstractAction;
-import org.structr.selenium.dsl.selector.StringSelector;
 import org.structr.selenium.dsl.token.TokenQueue;
 import org.structr.selenium.dsl.runner.interactive.Terminal;
+import org.structr.selenium.dsl.selector.AbstractSelector;
 
 /**
  */
 public class AssertCommand extends AbstractAction {
 
-	private StringSelector selector = null;
-	private String value             = null;
+	private AbstractSelector selector = null;
+	private Object value              = null;
 
 	public AssertCommand() {
 		super();
@@ -25,8 +24,8 @@ public class AssertCommand extends AbstractAction {
 	@Override
 	public void init(final TokenQueue args) {
 
-		selector = args.stringSelector(context, false);
-		value    = args.string(context, false);
+		selector = args.abstractSelector(context, false);
+		value    = args.any(context);
 	}
 
 	@Override
@@ -36,7 +35,7 @@ public class AssertCommand extends AbstractAction {
 
 	@Override
 	public String getErrorMessage() {
-		return "Assertion failure: " + selector.getElementMessage() + " not found.";
+		return "expected \"" + value + "\", got \"" + selector.get() + "\"";
 	}
 
 	@Override

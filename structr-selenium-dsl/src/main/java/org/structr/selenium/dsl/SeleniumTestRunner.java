@@ -13,7 +13,9 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -107,26 +109,32 @@ public class SeleniumTestRunner {
 			final SideFileRunner sideRunner     = new SideFileRunner(context);
 			final ScriptFileRunner scriptRunner = new ScriptFileRunner(context);
 			final Path root                     = suiteDir.toPath();
+			final Map<String, Path> sorted      = new TreeMap<>();
 
 			Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
 
 				@Override
 				public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
 
-					final String fileName = file.getFileName().toString();
-
-					if (fileName.endsWith(".side")) {
-
-						sideRunner.runSideFile(root, file);
-
-					} else if (fileName.endsWith(".test")) {
-
-						scriptRunner.runScriptFile(root, file);
-					}
+					sorted.put(file.toString(), file);
 
 					return FileVisitResult.CONTINUE;
 				}
 			});
+
+			for (final Path path : sorted.values()) {
+
+				final String fileName = path.getFileName().toString();
+
+				if (fileName.endsWith(".side")) {
+
+					sideRunner.runSideFile(root, path);
+
+				} else if (fileName.endsWith(".test")) {
+
+					scriptRunner.runScriptFile(root, path);
+				}
+			}
 
 			final int tests  = context.getTests();
 			final int passed = context.getPassed();

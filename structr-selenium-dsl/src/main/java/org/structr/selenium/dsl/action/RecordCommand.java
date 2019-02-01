@@ -28,7 +28,7 @@ public class RecordCommand extends AbstractAction {
 		final ScriptFile file = context.getCurrentScript();
 		if (file != null) {
 
-			context.startRecording();
+			context.setRecording(true);
 
 			out.println("Recording started, all action commands will be stored in the current script file. Use `stop` to stop recording.");
 

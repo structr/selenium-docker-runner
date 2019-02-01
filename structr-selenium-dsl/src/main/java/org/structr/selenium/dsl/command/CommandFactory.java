@@ -44,6 +44,7 @@ import org.structr.selenium.dsl.action.StopCommand;
 import org.structr.selenium.dsl.action.TypeCommand;
 import org.structr.selenium.dsl.action.AssertCommand;
 import org.structr.selenium.dsl.action.DeleteCommand;
+import org.structr.selenium.dsl.action.DoubleClickCommand;
 import org.structr.selenium.dsl.action.ExistsCommand;
 import org.structr.selenium.dsl.action.FindCommand;
 import org.structr.selenium.dsl.action.FromCommand;
@@ -84,6 +85,7 @@ public class CommandFactory {
 		commands.put("css",                   SelectorCommand.class);
 		commands.put("define",                DefineCommand.class);
 		commands.put("delete",                DeleteCommand.class);
+		commands.put("doubleclick",           DoubleClickCommand.class);
 		commands.put("exists",                ExistsCommand.class);
 		commands.put("from",                  FromCommand.class);
 		commands.put("find",                  FindCommand.class);
