@@ -30,7 +30,7 @@ public class RecordCommand extends AbstractAction {
 
 			context.startRecording();
 
-			out.println("Recording started, all action commands will be stored in the current script file.");
+			out.println("Recording started, all action commands will be stored in the current script file. Use `stop` to stop recording.");
 
 		} else {
 

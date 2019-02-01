@@ -135,7 +135,16 @@ public class Context {
 							executeNextLine = command.execute(terminal);
 
 							if (!terminal.isInteractive()) {
+
 								terminal.println(pad("OK", left, " "));
+
+							} else {
+
+								if (recordingEnabled) {
+
+									getCurrentScript().addCommand(line);
+									terminal.println("Action recorded.");
+								}
 							}
 
 							success = true;
