@@ -41,7 +41,7 @@ public class SaveCommand extends AbstractScriptAction {
 
 					if (!file.exists() || out.prompt("File exists, overwrite? (y/n) ") ) {
 
-						scriptFile.setPath(path);
+						scriptFile.setPath(file.getAbsolutePath());
 						scriptFile.save();
 					}
 
