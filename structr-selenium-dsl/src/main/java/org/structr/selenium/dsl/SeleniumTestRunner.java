@@ -80,7 +80,8 @@ public class SeleniumTestRunner {
 				System.out.println("Error: " + t.getMessage());
 			}
 
-			System.exit(exitCode);
+			// don't signal "error" in exit code as this will prevent cleanup after testing
+			//System.exit(exitCode);
 		}
 	}
 
