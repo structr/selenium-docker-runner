@@ -21,6 +21,7 @@ IMAGE_EXISTS=false
 DUMP_CONFIG=false
 RECORD=false
 NAME=structr:selenium
+SUMMARY=.
 EXIT_CODE=0
 
 function started() {
@@ -45,6 +46,7 @@ function usage() {
 	echo "    -l <logfile>    - use given log file (default: /dev/null)"
 	echo "    -n <image name> - use given test image name (default: $NAME)"
 	echo "    -r              - recording mode (dont run tests, just start the instance)"
+	echo "    -s <summary>    - create the given summary file"
 	echo "    -t <testsuite>  - run tests in the given directory"
 	echo "    -u              - update test image (don't resuse existing images)"
 	echo "    -v <version>    - use given Structr version (default: 3.1.1)"
@@ -72,6 +74,7 @@ while [ "$#" -gt 0 ]; do
 		-l) LOG="$2"; shift 2;;
 		-n) NAME="$2"; shift 2;;
 		-r) RECORD="true"; shift 1;;
+		-s) SUMMARY="$2"; shift 2;;
 		-t) TESTSUITE="$2"; shift 2;;
 		-u) REUSE_EXISTING="false"; shift 1;;
 		-v) VERSION="$2"; shift 2;;
@@ -101,6 +104,7 @@ if [ "$DUMP_CONFIG" == "true" ]; then
 	echo "    health check interval: $WAIT"
 	echo "    health check retries:  $MAX_TRIES"
 	echo "    recording mode:        $RECORD"
+	echo "    test summary file:     $SUMMARY"
 	echo
 
 	exit 0
@@ -269,6 +273,15 @@ else
 		docker exec -ti $CONTAINER /bin/sh -c 'cat /var/lib/structr/logs/server.log' >server.log
 		docker cp $TESTCONTAINER:/tmp/screenshots . >>$LOG
 	fi
+
+	echo "Downloading test summary file.."
+	if [ "$SUMMARY" != "." ]; then
+		TARGET=`dirname $SUMMARY`
+		if [ ! -e $TARGET ]; then
+			mkdir $TARGET
+		fi
+	fi
+	docker cp $TESTCONTAINER:/tmp/selenium-test-summary.xml $SUMMARY
 
 	echo "Stopping containers.." |tee -a $LOG
 	docker stop $CONTAINER >>$LOG || exit 1

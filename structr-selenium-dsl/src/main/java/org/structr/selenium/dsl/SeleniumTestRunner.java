@@ -19,12 +19,14 @@ import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.structr.selenium.dsl.common.FailsafeReportGenerator;
 import org.structr.selenium.dsl.runner.script.ScriptFile;
 import org.structr.selenium.dsl.runner.side.SideFileRunner;
 
@@ -36,8 +38,13 @@ public class SeleniumTestRunner {
 	private boolean headless    = true;
 	private WebDriver driver    = null;
 	private Context context     = null;
+	private String summaryPath  = null;
 	private File suiteDir       = null;
 	private int width           = 140;
+	private int tests           = 0;
+	private int passed          = 0;
+	private int failed          = 0;
+	private int errors          = 0;
 
 	public SeleniumTestRunner(final Queue<String> args) throws IOException {
 		init(args);
@@ -49,21 +56,21 @@ public class SeleniumTestRunner {
 
 		if (args.length < 1) {
 
-			System.out.println("usage: SeleniumTestRunner [-b <browser-engine>] [-i] [-w <width>] <testsuite>");
+			System.out.println("usage: SeleniumTestRunner [-e <browser-engine>] [-i] [-s <path>] [-u <baseUrl>] [-w <width>] <testsuite>");
 			System.out.println("");
 			System.out.println("parameters:");
 			System.out.println("    <testsuite> - directory with test files");
 			System.out.println("");
 			System.out.println("options:");
-			System.out.println("    -b  - browser engine [chrome|firefox]");
+			System.out.println("    -e  - browser engine [chrome|firefox]");
 			System.out.println("    -i  - interactive mode");
+			System.out.println("    -s  - write summary file to given path");
+			System.out.println("    -u  - base URL for test browser to connect to");
 			System.out.println("    -v  - visible mode (as opposed to headless): show test browser window");
 			System.out.println("    -w  - display width of output (default: 140)");
 			System.out.println("");
 
 		} else {
-
-			int exitCode = 0;
 
 			try {
 
@@ -72,20 +79,18 @@ public class SeleniumTestRunner {
 				// register shutdown hook
 				Runtime.getRuntime().addShutdownHook(new ShutdownHook(runner));
 
-				exitCode = runner.run();
-
+				runner.run();
 
 			} catch (Throwable t) {
 				t.printStackTrace();
 				System.out.println("Error: " + t.getMessage());
 			}
 
-			// don't signal "error" in exit code as this will prevent cleanup after testing
-			//System.exit(exitCode);
+
 		}
 	}
 
-	public int run() throws InterruptedException {
+	public void run() throws InterruptedException {
 
 		if (interactive) {
 
@@ -95,15 +100,28 @@ public class SeleniumTestRunner {
 				context.setCurrentScript(new ScriptFile(suiteDir.getAbsolutePath()));
 			}
 
-			return new InteractiveTestRunner(context).run();
+			new InteractiveTestRunner(context).run();
 
 		} else {
 
-			return runFromFile();
+			runFromFile();
+		}
+
+		// write failsafe summary report
+		if (summaryPath != null) {
+
+			try {
+
+				final FailsafeReportGenerator reportGenerator = new FailsafeReportGenerator(passed, errors, failed, 0);
+				reportGenerator.writeReport(summaryPath);
+
+			} catch (ParserConfigurationException ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 
-	public int runFromFile() {
+	public void runFromFile() {
 
 		try {
 
@@ -137,21 +155,17 @@ public class SeleniumTestRunner {
 				}
 			}
 
-			final int tests  = context.getTests();
-			final int passed = context.getPassed();
-			final int failed = context.getFailed();
-			final int errors = context.getErrors();
+			tests  = context.getTests();
+			passed = context.getPassed();
+			failed = context.getFailed();
+			errors = context.getErrors();
 
 			System.out.println("Summary: " + tests + " test" + (tests == 1 ? "" : "s") + " executed, " + passed + "/" + (passed + failed) + " commands succeeded, " + errors + " errors.");
-
-			return failed + errors;
 
 		} catch (IOException ioex) {
 
 			System.out.println("Error: " + ioex.getMessage());
 		}
-
-		return 1;
 	}
 
 	public void done() {
@@ -178,6 +192,10 @@ public class SeleniumTestRunner {
 
 					case "-i":
 						interactive = true;
+						break;
+
+					case "-s":
+						summaryPath = getOrThrow(args.poll(), "Missing parameter for summary file (-s).");
 						break;
 
 					case "-u":
